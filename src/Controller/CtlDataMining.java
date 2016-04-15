@@ -29,7 +29,8 @@ public class CtlDataMining {
 
     public String definirEncabezado(Instances data) {
         /*Se define el encabezado del mensaje, teniendo en cuanta el atributo clase*/
-        String descripcion = "<b>El atributo clase seleccionado es " + data.attribute(data.numAttributes() - 1).name() + "</b>";
+        String descripcion = "<b>El atributo clase seleccionado es "
+                + data.attribute(data.numAttributes() - 1).name() + "</b>";
         descripcion += " <b>con posibles valores:</b> ";
         /*Se recorren los posibles valores del atributo clase*/
         for (int z = 0; z < data.attribute(data.numAttributes() - 1).numValues(); z++) {
@@ -39,71 +40,119 @@ public class CtlDataMining {
         return descripcion;
     }
 
+    /*Funcion que aplica una red bayesiana a un conjunto de datos 
+    recibidos por parametro*/
     public String redBayesiana(Instances data) {
-
         try {
-
             //Creamos un clasificador Bayesiano                
             NaiveBayes nb = new NaiveBayes();
+
             //creamos el clasificador de la redBayesiana 
             nb.buildClassifier(data);
 
-            Evaluation evalB = new Evaluation(data);//Creamos un objeto para la validacion del modelo con redBayesiana
+            //Creamos un objeto para la validacion del modelo con redBayesiana
+            Evaluation evalB = new Evaluation(data);
 
-            /*Aplicamos el clasificador bayesiano*/
-            evalB.crossValidateModel(nb, data, 10, new Random(1));//hacemos validacion cruzada, de redBayesiana, con 10 campos, y el aleatorio                                
-            String resBay = "<br><br><b><center>Resultados NaiveBayes</center><br>========<br>Modelo generado indica los siguientes resultados:<br>========<br></b>";//Obtenemos resultados
-            resBay = resBay + ("<b>1. Numero de instancias clasificadas:</b> " + (int) evalB.numInstances() + "<br>");
-            resBay = resBay + ("<b>2. Porcentaje de instancias correctamente clasificadas:</b> " + formato.format(evalB.pctCorrect()) + "%<br>");
-            resBay = resBay + ("<b>3. Numero de instancias correctamente clasificadas:</b> " + (int) evalB.correct() + "<br>");
-            resBay = resBay + ("<b>4. Porcentaje de instancias incorrectamente clasificadas:</b> " + formato.format(evalB.pctIncorrect()) + "%<br>");
-            resBay = resBay + ("<b>5. Numero de instancias incorrectamente clasificadas:</b> " + (int) evalB.incorrect() + "<br>");
-            resBay = resBay + ("<b>6. Media del error absoluto:</b> " + formato.format(evalB.meanAbsoluteError()) + "%<br>");
-            resBay = resBay + ("<b>7. " + evalB.toMatrixString("Matriz de confusion</b>").replace("\n", "<br>"));
+            /*Aplicamos el clasificador bayesiano
+            hacemos validacion cruzada, de redBayesiana, con 10 campos, 
+            y un aleatorio para la semilla, en este caso es 1 para el 
+            muestreo de la validacion cruzada (Como ordenar para luego
+            partirlo en 10)*/
+            evalB.crossValidateModel(nb, data, 10, new Random(1));
+
+            String resBay = "<br><br><b><center>Resultados NaiveBayes</center>"
+                    + "<br>========<br>"
+                    + "Modelo generado indica los siguientes resultados:"
+                    + "<br>========<br></b>";
+            //Obtenemos resultados
+            resBay = resBay + ("<b>1. Numero de instancias clasificadas:</b> "
+                    + (int) evalB.numInstances() + "<br>");
+            resBay = resBay + ("<b>2. Porcentaje de instancias correctamente "
+                    + "clasificadas:</b> " + formato.format(evalB.pctCorrect())
+                    + "%<br>");
+            resBay = resBay + ("<b>3. Numero de instancias correctamente "
+                    + "clasificadas:</b> " + (int) evalB.correct() + "<br>");
+            resBay = resBay + ("<b>4. Porcentaje de instancias incorrectamente "
+                    + "clasificadas:</b> " + formato.format(evalB.pctIncorrect())
+                    + "%<br>");
+            resBay = resBay + ("<b>5. Numero de instancias incorrectamente "
+                    + "clasificadas:</b> " + (int) evalB.incorrect() + "<br>");
+            resBay = resBay + ("<b>6. Media del error absoluto:</b> "
+                    + formato.format(evalB.meanAbsoluteError()) + "%<br>");
+            resBay = resBay + ("<b>7. " + evalB.toMatrixString("Matriz de "
+                    + "confusion</b>").replace("\n", "<br>"));
 
             return resBay;
 
         } catch (Exception e) {
             return "El error es" + e.getMessage();
-
         }
-
     }
 
+    /*Funcion que aplica arbol de prediccion a un conjunto de datos 
+    recibidos por parametro*/
     public String arbolJ48(Instances data) {
-
         try {
             // Creamos un clasidicador J48
             J48 j48 = new J48();
-            j48.buildClassifier(data);//creamos el clasificador  del J48 con los datos 
-            
-            Evaluation evalJ48 = new Evaluation(data);//Creamos un objeto para la validacion del modelo con redBayesiana
+            //creamos el clasificador  del J48 con los datos 
+            j48.buildClassifier(data);
 
-            /*Aplicamos el clasificador J48*/
-            evalJ48.crossValidateModel(j48, data, 10, new Random(1));//hacemos validacion cruzada, de redBayesiana, con 10 campos, y el aleatorio                 
-            String resJ48 = "<br><b><center>Resultados Arbol de decision J48</center><br>========<br>Modelo generado indica los siguientes resultados:<br>========<br></b>";//Obtenemos resultados
+            //Creamos un objeto para la validacion del modelo con redBayesiana
+            Evaluation evalJ48 = new Evaluation(data);
 
-            resJ48 = resJ48 + ("<b>1. Numero de instancias clasificadas:</b> " + (int) evalJ48.numInstances() + "<br>");
-            resJ48 = resJ48 + ("<b>2. Porcentaje de instancias correctamente clasificadas:</b> " + formato.format(evalJ48.pctCorrect()) + "<br>");
-            resJ48 = resJ48 + ("<b>3. Numero de instancias correctamente clasificadas:</b>" + (int) evalJ48.correct() + "<br>");
-            resJ48 = resJ48 + ("<b>4. Porcentaje de instancias incorrectamente clasificadas:</b> " + formato.format(evalJ48.pctIncorrect()) + "<br>");
-            resJ48 = resJ48 + ("<b>5. Numero de instancias incorrectamente clasificadas:</b> " + (int) evalJ48.incorrect() + "<br>");
-            resJ48 = resJ48 + ("<b>6. Media del error absoluto:</b> " + formato.format(evalJ48.meanAbsoluteError()) + "<br>");
-            resJ48 = resJ48 + ("<b>7. " + evalJ48.toMatrixString("Matriz de confusion</b>").replace("\n", "<br>"));
+            /*Aplicamos el clasificador J48
+            hacemos validacion cruzada, de redBayesiana, con 10 campos, 
+            y el aleatorio arrancando desde 1 para la semilla*/
+            evalJ48.crossValidateModel(j48, data, 10, new Random(1));
+            //Obtenemos resultados
+            String resJ48 = "<br><b><center>Resultados Arbol de decision J48"
+                    + "</center><br>========<br>Modelo generado indica los "
+                    + "siguientes resultados:<br>========<br></b>";
 
-            // Se grafica el arbol de decision 
-            final javax.swing.JFrame jf = new javax.swing.JFrame("Arbol de decision: J48");
+            resJ48 = resJ48 + ("<b>1. Numero de instancias clasificadas:</b> "
+                    + (int) evalJ48.numInstances() + "<br>");
+            resJ48 = resJ48 + ("<b>2. Porcentaje de instancias correctamente "
+                    + "clasificadas:</b> " + formato.format(evalJ48.pctCorrect())
+                    + "<br>");
+            resJ48 = resJ48 + ("<b>3. Numero de instancias correctamente "
+                    + "clasificadas:</b>" + (int) evalJ48.correct() + "<br>");
+            resJ48 = resJ48 + ("<b>4. Porcentaje de instancias incorrectamente "
+                    + "clasificadas:</b> " + formato.format(evalJ48.pctIncorrect())
+                    + "<br>");
+            resJ48 = resJ48 + ("<b>5. Numero de instancias incorrectamente "
+                    + "clasificadas:</b> " + (int) evalJ48.incorrect() + "<br>");
+            resJ48 = resJ48 + ("<b>6. Media del error absoluto:</b> "
+                    + formato.format(evalJ48.meanAbsoluteError()) + "<br>");
+            resJ48 = resJ48 + ("<b>7. " + evalJ48.toMatrixString("Matriz de"
+                    + " confusion</b>").replace("\n", "<br>"));
+
+            // SE GRAFICA EL ARBOL GENERADO
+            //Se crea un Jframe Temporal
+            final javax.swing.JFrame jf
+                    = new javax.swing.JFrame("Arbol de decision: J48");
+            /*Se asigna un tamaño*/
             jf.setSize(500, 400);
+            /*Se define un borde*/
             jf.getContentPane().setLayout(new BorderLayout());
-            TreeVisualizer tv = new TreeVisualizer(null, j48.graph(), new PlaceNode2());
+            /*Se instancia la grafica del arbol, estableciendo el tipo J48
+            Parametros (Listener, Tipo de arbol, Tipo de nodos)
+            El placeNode2 colocará los nodos para que caigan en forma uniforme
+            por debajo de su padre*/
+            TreeVisualizer tv = new TreeVisualizer(null, j48.graph(),
+                    new PlaceNode2());
+            /*Añade el arbol centrandolo*/
             jf.getContentPane().add(tv, BorderLayout.CENTER);
+            /*Añadimos un listener para la X del close*/
             jf.addWindowListener(new java.awt.event.WindowAdapter() {
+                @Override
                 public void windowClosing(java.awt.event.WindowEvent e) {
                     jf.dispose();
                 }
             });
-
+            /*Lo visualizamos*/
             jf.setVisible(true);
+            /*Ajustamos el arbol al ancho del JFRM*/
             tv.fitToScreen();
 
             return resJ48;
@@ -115,20 +164,28 @@ public class CtlDataMining {
     }
 
     public String apriori(Instances data) {
-
         try {
             //Creamos un objeto de asosiacion por apriori
             Apriori aso = new Apriori();
 
-            aso.buildAssociations(data);//creamos el descriptivo apriori con los datos
+            //creamos el descriptivo apriori con los datos
+            aso.buildAssociations(data);
 
-            
             /*Se cargan los resultados de loa asociacion apriori*/
-            String resApriori = "<br><b><center>Resultados Asociacion Apriori</center><br>========<br>El modelo de asociacion generado indica los siguientes resultados:<br>========<br></b>";//Obtenemos resultados
+            String resApriori = "<br><b><center>Resultados Asociacion "
+                    + "Apriori</center><br>========<br>El modelo de asociacion "
+                    + "generado indica los siguientes resultados:"
+                    + "<br>========<br></b>";
+
+            //Obtenemos resultados
             for (int i = 0; i < aso.getAssociationRules().getRules().size(); i++) {
-                resApriori = resApriori + "<b>" + (i + 1) + ". Si</b> " + aso.getAssociationRules().getRules().get(i).getPremise().toString();
-                resApriori = resApriori + " <b>Entonces</b> " + aso.getAssociationRules().getRules().get(i).getConsequence().toString();
-                resApriori = resApriori + " <b>Con un</b> " + (int) (aso.getAssociationRules().getRules().get(i).getPrimaryMetricValue() * 100) + "% de probabilidad<br>";
+                resApriori = resApriori + "<b>" + (i + 1) + ". Si</b> "
+                        + aso.getAssociationRules().getRules().get(i).getPremise().toString();
+                resApriori = resApriori + " <b>Entonces</b> "
+                        + aso.getAssociationRules().getRules().get(i).getConsequence().toString();
+                resApriori = resApriori + " <b>Con un</b> "
+                        + (int) (aso.getAssociationRules().getRules().get(i).getPrimaryMetricValue() * 100)
+                        + "% de probabilidad<br>";
             }
 
             return resApriori;
@@ -153,6 +210,7 @@ public class CtlDataMining {
             //cerramos el objeto buffer
             br.close();
 
+            /*Obtenemos resultados*/
             String descripcion = definirEncabezado(data);
             String resultadoBayesiano = redBayesiana(data);
             String resultadoJ48 = arbolJ48(data);
